@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Sale } from "../../models/sale";
+import { BASE_URL } from "../../utils/request";
 
 import NotificationButton from "../NotificationButton";
 
@@ -13,15 +15,17 @@ function SalesCard() {
     const min = new Date(new Date().setDate(new Date().getDate() - 365));
     const max = new Date();
 
-const [minDate, setMinDate] = useState(min);
-const [maxDate, sertMaxDate] = useState(max);
+    const [minDate, setMinDate] = useState(min);
+    const [maxDate, sertMaxDate] = useState(max);
 
-useEffect(() => {
-    axios.get("http://localhost:8080/sales")
-    .then(response => {
-        console.log(response.data);
-    })
-}, []);
+    const [sales, setSales] = useState<Sale[]>([]);
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/sales`)
+            .then(response => {
+                setSales(response.data.content);
+            })
+    }, []);
 
     return (
         <div className="dsmeta-card">
@@ -58,45 +62,27 @@ useEffect(() => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className="visibilidade-992-component">#341</td>
-                            <td className="visibilidade-576-component">10/07/2022</td>
-                            <td>Anakin</td>
-                            <td className="visibilidade-992-component">15</td>
-                            <td className="visibilidade-992-component">11</td>
-                            <td>R$ 55300.00</td>
-                            <td>
-                                <div className="dsmeta-red-btn-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="visibilidade-992-component">#341</td>
-                            <td className="visibilidade-576-component">11/07/2022</td>
-                            <td>Anakin</td>
-                            <td className="visibilidade-992-component">15</td>
-                            <td className="visibilidade-992-component">11</td>
-                            <td>R$ 55300.00</td>
-                            <td>
-                                <div className="dsmeta-red-btn-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="visibilidade-992-component">#341</td>
-                            <td className="visibilidade-576-component"> 12/07/2022</td>
-                            <td>Anakin</td>
-                            <td className="visibilidade-992-component">15</td>
-                            <td className="visibilidade-992-component">11</td>
-                            <td>R$ 55300.00</td>
-                            <td>
-                                <div className="dsmeta-red-btn-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
+                        {sales.map(sale => {
+                            return (
+                                <tr key={sale.id}>
+                                    <td className="visibilidade-992-component">{sale.id}</td>
+                                    <td className="visibilidade-576-component">{new Date(sale.date).toLocaleDateString()}</td>
+                                    <td>{sale.sellerName}</td>
+                                    <td className="visibilidade-992-component">{sale.visited}</td>
+                                    <td className="visibilidade-992-component">{sale.deals}</td>
+                                    <td>{sale.amount.toFixed(2)}</td>
+                                    <td>
+                                        <div className="dsmeta-red-btn-container">
+                                            <NotificationButton />
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            )
+                        })
+                        }
+
+
                     </tbody>
                 </table>
 
